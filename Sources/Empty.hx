@@ -39,27 +39,32 @@ class Empty {
 		pipeline.inputLayout = [posStructure, normStructure];
 		pipeline.fragmentShader = Shaders.simple_frag;
 		pipeline.vertexShader = Shaders.simple_vert;
-        pipeline.cullMode = CullMode.Clockwise;
 		pipeline.compile();
 
 		mvpID = pipeline.getConstantLocation("MVP");
 		mID = pipeline.getConstantLocation("M");
 
-        var projection = GLM.perspective(45, 4/3, 0.1, 100, new Mat4());
-        var view = GLM.lookAt(
+        //var projection = GLM.perspective(45, 4/3, 0.01, 10, new Mat4());
+        /*var view = GLM.lookAt(
             new Vec3(4, 3, 3),
             new Vec3(0, 0, 0),
             new Vec3(0, 1, 0),
             new Mat4()
+        );*/
+        var projection = kha.math.FastMatrix4.perspectiveProjection(45, 4/3, 0.01, 100);
+        var view = kha.math.FastMatrix4.lookAt(
+            new kha.math.FastVector3(4, 3, 3),
+            new kha.math.FastVector3(0, 0, 0),
+            new kha.math.FastVector3(0, 1, 0)
         );
 		m = new Mat4().identity();
         mvp = projection * view * m;
 
-        var raw:TGLTF = GLTF.parse(Assets.blobs.cone_gltf.toString());
-        var cone:GLTF = GLTF.load(raw, [Assets.blobs.cone_bin.bytes]);
-        var positions:haxe.ds.Vector<Float> = cone.meshes[0].primitives[0].getFloatAttributeValues("POSITION");
-        var normals:haxe.ds.Vector<Float> = cone.meshes[0].primitives[0].getFloatAttributeValues("NORMAL");
-        var indices:haxe.ds.Vector<Int> = cone.meshes[0].primitives[0].getIndexValues();
+        var raw:TGLTF = GLTF.parse(Assets.blobs.suzanne_gltf.toString());
+        var object:GLTF = GLTF.load(raw, [Assets.blobs.suzanne_bin.bytes]);
+        var positions:haxe.ds.Vector<Float> = object.meshes[0].primitives[0].getFloatAttributeValues("POSITION");
+        var normals:haxe.ds.Vector<Float> = object.meshes[0].primitives[0].getFloatAttributeValues("NORMAL");
+        var indices:haxe.ds.Vector<Int> = object.meshes[0].primitives[0].getIndexValues();
 
 		positionBuffer = new VertexBuffer(
 			Std.int(positions.length / 3),

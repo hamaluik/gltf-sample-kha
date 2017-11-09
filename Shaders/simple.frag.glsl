@@ -14,11 +14,11 @@ void main() {
 	/*float dLight0 = clamp(dot(norm, vec3(0, 0.70710678118, 0.70710678118)), 0.0, 1.0);
     colour += vec3(1.0, 1.0, 1.0) * dLight0 * vec3(0.0, 1.0, 0.0);*/
 
-    vec3 pLightDir = vec3(0.0, 1.0, 0.0) - pos;
+    /*vec3 pLightDir = vec3(0.0, 2.0, 2.0) - pos;
     float pDist = length(pLightDir);
-    float pLight = clamp(dot(norm, pLightDir), 0.0, 1.0) * 1 / (pDist * pDist);
-    colour += vec3(1.0, 1.0, 1.0) * pLight * vec3(0.8, 0.8, 0.8);
+    float pLight = clamp(dot(norm, pLightDir), 0.0, 1.0) * 2 / (pDist * pDist);
+    colour += vec3(1.0, 1.0, 1.0) * pLight * vec3(0.8, 0.8, 0.8);*/
 
     // output!
-    fragColour = vec4(colour, 1.0);
+    fragColour = vec4(norm, 1.0);
 }
