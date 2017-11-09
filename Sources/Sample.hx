@@ -14,6 +14,8 @@ import kha.graphics4.Usage;
 import kha.graphics4.ConstantLocation;
 import kha.graphics4.CullMode;
 import kha.graphics4.CompareMode;
+import kha.graphics4.TextureUnit;
+import kha.Image;
 import gltf.GLTF;
 import gltf.schema.TGLTF;
 import glm.GLM;
@@ -22,12 +24,16 @@ using glm.Quat;
 using glm.Vec3;
 
 class Sample {
+	var pipeline:PipelineState;
+
     var vertexBuffer:VertexBuffer;
 	var indexBuffer:IndexBuffer;
-	var pipeline:PipelineState;
+
+    var tex:Image;
 
 	var mvpID:ConstantLocation;
 	var mID:ConstantLocation;
+    var texID:TextureUnit;
 
     var rotation:Quat;
 	var model:Mat4;
@@ -46,12 +52,19 @@ class Sample {
 		pipeline.fragmentShader = Shaders.simple_frag;
 		pipeline.vertexShader = Shaders.simple_vert;
         pipeline.cullMode = CullMode.Clockwise;
-        pipeline.depthMode = CompareMode.GreaterEqual;
+        pipeline.depthMode = CompareMode.Less;
         pipeline.depthWrite = true;
-		pipeline.compile();
+
+        try {
+            pipeline.compile();
+        }
+        catch(e:Dynamic) {
+            js.Browser.console.error(e);
+        }
 
 		mvpID = pipeline.getConstantLocation("MVP");
 		mID = pipeline.getConstantLocation("M");
+        texID = pipeline.getTextureUnit("albedoTex");
 
 		var projection = GLM.perspective(45, 4/3, 0.1, 1000, new Mat4());
         var view = GLM.lookAt(
@@ -66,11 +79,15 @@ class Sample {
         rotation = new Quat().identity();
 
         var raw:TGLTF = GLTF.parse(Assets.blobs.Duck_gltf.toString());
-        var object:GLTF = GLTF.load(raw, [Assets.blobs.Duck0_bin.bytes]);
+        var buffers:Vector<haxe.io.Bytes> = new Vector<haxe.io.Bytes>(1);
+        buffers[0] = Assets.blobs.Duck0_bin.bytes;
+        var object:GLTF = GLTF.load(raw, buffers);
         var positions:Vector<Float> = object.meshes[0].primitives[0].getFloatAttributeValues("POSITION");
         var normals:Vector<Float> = object.meshes[0].primitives[0].getFloatAttributeValues("NORMAL");
         var uvs:Vector<Float> = object.meshes[0].primitives[0].getFloatAttributeValues("TEXCOORD_0");
         var indices:Vector<Int> = object.meshes[0].primitives[0].getIndexValues();
+
+        tex = Assets.images.DuckCM;
 
         var numVerts:Int = Std.int(positions.length / 3);
 		vertexBuffer = new VertexBuffer(numVerts, structure, Usage.StaticUsage);
@@ -98,7 +115,7 @@ class Sample {
     }
 
     public function update():Void {
-        rotation.multiplyQuats(Quat.fromEuler(0, 0.5 * Math.PI * (1/60), 0, new Quat()), rotation);
+        rotation.multiplyQuats(Quat.fromEuler(0, -0.5 * Math.PI * (1/60), 0, new Quat()), rotation);
         GLM.rotate(rotation, model);
         mvp = vp * model;
     }
@@ -106,13 +123,14 @@ class Sample {
 	public function render(frame:Framebuffer) {
 		var g = frame.g4;
         g.begin();
-		g.clear(Color.fromFloats(0.33, 0.33, 0.33), 0);
+		g.clear(Color.fromFloats(0.33, 0.33, 0.33), 1);
 
 		g.setVertexBuffer(vertexBuffer);
 		g.setIndexBuffer(indexBuffer);
 		g.setPipeline(pipeline);
 		g.setMatrix(mvpID, mvp);
 		g.setMatrix(mID, model);
+        g.setTexture(texID, tex);
 		g.drawIndexedVertices();
 
 		g.end();
