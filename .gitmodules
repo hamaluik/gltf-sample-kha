@@ -1,0 +1,9 @@
+[submodule "Kha"]
+	path = Kha
+	url = https://github.com/KTXSoftware/Kha
+[submodule "Libraries/gltf"]
+	path = Libraries/gltf
+	url = https://github.com/FuzzyWuzzie/haxe-gltf.git
+[submodule "Libraries/glm"]
+	path = Libraries/glm
+	url = https://github.com/FuzzyWuzzie/haxe-glm.git
