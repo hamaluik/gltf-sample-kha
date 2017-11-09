@@ -4,4 +4,5 @@ project.addShaders('Shaders/**');
 project.addSources('Sources');
 project.addLibrary('glm');
 project.addLibrary('gltf');
+project.addParameter('-debug');
 resolve(project);

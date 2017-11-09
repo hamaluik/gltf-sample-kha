@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"taskName": "khamake html5",
+			"command": "node",
+			"args": ["kha/make", "html5"],
+			"problemMatcher": "$haxe"
+		}
+	]
+}

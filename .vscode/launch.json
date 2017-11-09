@@ -1,0 +1,12 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+        {
+            "name": "Kha/HTML5",
+            "type": "chrome",
+            "request": "launch",
+			"preLaunchTask": "khamake html5",
+            "file": "${workspaceRoot}/build/html5/index.html"
+        }
+	]
+}
