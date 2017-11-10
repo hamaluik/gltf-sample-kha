@@ -15,6 +15,9 @@ import kha.graphics4.ConstantLocation;
 import kha.graphics4.CullMode;
 import kha.graphics4.CompareMode;
 import kha.graphics4.TextureUnit;
+import kha.System;
+import kha.graphics4.TextureFormat;
+import kha.graphics4.DepthStencilFormat;
 import kha.Image;
 import gltf.GLTF;
 import gltf.schema.TGLTF;
@@ -24,6 +27,8 @@ using glm.Quat;
 using glm.Vec3;
 
 class Sample {
+    var backBuffer:Image;
+
 	var pipeline:PipelineState;
 
     var vertexBuffer:VertexBuffer;
@@ -39,6 +44,8 @@ class Sample {
 	var model:Mat4;
     var vp:Mat4;
 	var mvp:Mat4;
+
+    var screenQuad:ScreenQuad;
 
 	public function new() {
         var structure = new VertexStructure();
@@ -112,6 +119,12 @@ class Sample {
 			iData[i] = indices[i];
 		}
 		indexBuffer.unlock();
+
+        backBuffer = Image.createRenderTarget(
+            System.windowWidth(), System.windowHeight(),
+            TextureFormat.RGBA32, DepthStencilFormat.DepthAutoStencilAuto
+        );
+        screenQuad = new ScreenQuad();
     }
 
     public function update():Void {
@@ -121,18 +134,17 @@ class Sample {
     }
 
 	public function render(frame:Framebuffer) {
-		var g = frame.g4;
-        g.begin();
-		g.clear(Color.fromFloats(0.33, 0.33, 0.33), 1);
+        backBuffer.g4.begin();
+		backBuffer.g4.clear(Color.fromFloats(0.33, 0.33, 0.33), 1);
 
-		g.setVertexBuffer(vertexBuffer);
-		g.setIndexBuffer(indexBuffer);
-		g.setPipeline(pipeline);
-		g.setMatrix(mvpID, mvp);
-		g.setMatrix(mID, model);
-        g.setTexture(texID, tex);
-		g.drawIndexedVertices();
+		backBuffer.g4.setVertexBuffer(vertexBuffer);
+		backBuffer.g4.setIndexBuffer(indexBuffer);
+		backBuffer.g4.setPipeline(pipeline);
+		backBuffer.g4.setMatrix(mvpID, mvp);
+		backBuffer.g4.setMatrix(mID, model);
+        backBuffer.g4.setTexture(texID, tex);
+		backBuffer.g4.drawIndexedVertices();
 
-		g.end();
+		screenQuad.render(frame.g4, backBuffer);
     }
 }
