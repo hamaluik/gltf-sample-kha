@@ -55,12 +55,7 @@ class Sample {
         pipeline.depthMode = CompareMode.Less;
         pipeline.depthWrite = true;
 
-        try {
-            pipeline.compile();
-        }
-        catch(e:Dynamic) {
-            js.Browser.console.error(e);
-        }
+        pipeline.compile();
 
 		mvpID = pipeline.getConstantLocation("MVP");
 		mID = pipeline.getConstantLocation("M");
@@ -79,9 +74,7 @@ class Sample {
         rotation = new Quat().identity();
 
         var raw:TGLTF = GLTF.parse(Assets.blobs.Duck_gltf.toString());
-        var buffers:Vector<haxe.io.Bytes> = new Vector<haxe.io.Bytes>(1);
-        buffers[0] = Assets.blobs.Duck0_bin.bytes;
-        var object:GLTF = GLTF.load(raw, buffers);
+        var object:GLTF = GLTF.load(raw, [Assets.blobs.Duck0_bin.bytes]);
         var positions:Vector<Float> = object.meshes[0].primitives[0].getFloatAttributeValues("POSITION");
         var normals:Vector<Float> = object.meshes[0].primitives[0].getFloatAttributeValues("NORMAL");
         var uvs:Vector<Float> = object.meshes[0].primitives[0].getFloatAttributeValues("TEXCOORD_0");
